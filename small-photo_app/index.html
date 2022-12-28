@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebCam</title>
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+</head>
+
+<body onload="init();">
+    <h1>Let's take a beautiful pictures 😊 📸</h1>
+    <h3>Created by Thar Nyi Phyo ( Ko Nyi )</h3>
+    <section>
+    <div>
+        <video width=400 height=400 id="video" class="vid" autoplay></video>
+        
+            <button class="btn" id="start">start</button>
+
+            <button class="btn" id="stop">stop</button>
+
+            <select class="btn" id="photo-filter">
+                <option value="none">affect</option>
+                <option value="blur(10px)">blur</option>
+                <option value="brightness(5)">brightness</option>
+                <option value="contrast(200%)">contrast</option>
+                <option value="hue-rotate(90deg)">hue-rotate</option>
+                <option value="saturate(10)">saturate</option>
+                <option value="grayscale(100%)">grayscale</option>
+                <option value="sepia(100%)">sepia</option>
+                <option value="invert(100%)">invert</option>
+                <option value="drop-shadow(16px 16px 20px blue)">drop-shadow</option>
+                <option value="opacity(25%)">opacity</option>
+                <option value="opacity(25%)">opacity</option>
+            </select>
+        
+            <button class="btn" id="clear-button">clear</button>
+
+            <button class="btn" id="photo">take photo</button>
+            <button class="btn" id="save">save</button>
+    </div>
+</section>
+    <p>
+        <canvas  id="myCanvas" width="720" height="100">
+        <canvas  id="myHiddenCanvas" class="hiddenCanvas" width="400" height="320">
+        </canvas> 
+        <canvas id="texCanvas" width="1000" height="500"></canvas>
+</body>
+
+</html>
