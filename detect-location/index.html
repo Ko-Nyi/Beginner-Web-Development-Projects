@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Geocoder with leaflet</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no initial-scale=1, maximum-scale=1" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@latest/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist Control.Geocoder.css" />
+
+    <script src="https://unpkg.com/leaflet@latest/dist/leaflet-src.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+</head>
+
+<body onload="getLocation();">
+   
+    <h1>Detect your location</h1>
+    <form>
+
+        <fieldset>
+            <div id="map" style="width: 450px; height: 300px"></div>
+        </fieldset>
+
+        <fieldset>
+            <input id="surfaceAddress" size=60 type="text">
+        </fieldset>
+
+    </form>
+    <div id="map"></div>
+    <div id="address"><strong>Your address is</strong> : </div>
+</body>
+
+</html>
