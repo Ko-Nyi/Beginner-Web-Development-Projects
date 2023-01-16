@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Recipes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>DESIGN RECIPES</h1>
+        <p>In this course, we teach an approach to program design based on design recipes. Each recipe is applicable to
+            certain problems, and systematizes the process of designing solutions to those problems.
+        </p>
+        <p>There are three core recipes that are used most frequently. The templating recipes are used as part of the
+            design of every data definition and function. Abstraction recipes are used to reduce redundancy in code.</p>
+        <p>There is also a checklist to help you remember the recipe steps.</p>
+    </header>
+    <section class="sect1">
+        <table id="table">
+            <thead>
+                <tr>
+                    <th rowspan="2">Core Recipes</th>
+                    <th colspan="2">Templating</th>
+                    <th rowspan="2">Abstraction</th>
+                </tr>
+                <tr>
+                    <th>Data Driven</th>
+                    <th>Control Driven</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><a href="#p1">How to Design Function(HtDF)</a>
+                        <p>Design any function</p>
+                    </td>
+                    <td><a href="#p4">Data Driven Templates</a>
+                        <p>Produce template for a data definition based on the form of the type comment.</p>
+                    </td>
+                    <td>Function Composition</td>
+                    <td>From Examples
+                        <p>Produce an abstract function given two similar functions.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><a href="#p2">How to Design Data(HtDD)</a>
+                        <p>Produce data definitions based on structure of the information to be represented.</p>
+                    </td>
+                    <td>2 One of-Data
+                        <p>Functions where 2 arguments have a one-of in their type comments.</p>
+                    </td>
+                    <td>Backtracking Search</td>
+                    <td>From Type Comments
+                        <p>Produce a fold function given type comments.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><a href="#p3">How to Design Worlds(HtDW)</a>
+                        <p>Produce interactive programs that use big-bang. </p>
+                    </td>
+                    <td rowspan="2"></td>
+                    <td>Generative Recursion</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td rowspan="2"></td>
+                    <td>Accumlators</td>
+                    <td>Using Abstraction Functions</td>
+                </tr>
+                <tr>
+                    <td class="div" colspan="2">Template Blending</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        <hr>
+    </section>
+    <section>
+        <a class="back" href="#table">Back to Design Recipes Table</a>
+        <h2 id="p1">How to Design Function(HtDF)</h2>
+        <p>The How to Design Functions (HtDF) recipe is a design method that enables systematic design of functions. We
+            will use this recipe throughout the term, although we will enhance it as we go to solves more complex
+            problems.</p>
+        <article class="box">
+            <h5>The HtDF recipe consists of the following steps:</h5>
+            <ol>
+                <li><a href="#sing">Signature,purpose and stub.</a></li>
+                <li><a href="#define">Define examples, wrap each in check-expect.</a></li>
+                <li><a href="#temp">Template and inventory</a>.</li>
+                <li><a href="#code2">Code the function body.</a></li>
+                <li><a href="#test">Test and debug until correct.</a></li>
+            </ol>
+            <h4>NOTE:</h4>
+            <ul>
+                <li>Each of these steps build on the ones that precede it. The signature helps write the purpose, the
+                    stub, and the check-expects; it also helps code the body. The purpose helps write the check-expects
+                    and code the body. The stub helps to write the check-expects. The check-expects help to code the
+                    body as well as to test the complete design.</li>
+                <li>It is sometimes helpful to do the steps in a different order. Sometimes it is easier to write
+                    examples first, then do signature and purpose. Often at some point during the design you may
+                    discover an issue or boundary condition you did not anticipate, at that point go back and update the
+                    purpose and examples accordingly. But you should never write the function definition first and then
+                    go back and do the other recipe elements -- for some of you that will work for simple functions, but
+                    you will not be able to do that for the complex functions later in the course!</li>
+                <li>Throughout the HtDF process be sure to "run early and run often". Run your program whenever it is
+                    well-formed. The more often you press run the sooner you can find mistakes. Finding mistakes one at
+                    a time is much easier than waiting until later when the mistakes can compound and be more confusing.
+                    Run, run, run!</li>
+            </ul>
+        </article>
+        <h4 id="sing">Signature, purpose and stub.</h4>
+        <p>Write the function signature, a one-line purpose statement and a function stub.</p>
+        <p>A signature has the type of each argument, separated by spaces, followed by ->, followed by the type of
+            result. So a function that consumes an image and produces a number would have the signature Image -> Number.
+        </p>
+        <p>Note that the stub is a syntactically complete function definition that produces a value of the right type.
+            If the type is Number it is common to use 0, if the type is String it is common to use "a" and so on. The
+            value will not, in general, match the purpose statement. In the example below the stub produces 0, which is
+            a Number, but only matches the purpose when double happens to be called with 0.</p>
+
+        <p>
+            <code>;; Number -> Number
+            ;; produces n times 2
+            <br>
+            <br>
+            (define (double n)  0)  ; 
+            this is the stub</code>
+        </p>
+        <p>The purpose of the stub is to serve as a kind of scaffolding to make it possible to run the examples even
+            before the function design is complete. With the stub in place check-expects that call the function can run.
+            Most of them will fail of course, but the fact that they can run at all allows you to ensure that they are
+            at least well-formed: parentheses are balanced, function calls have the proper number of arguments, function
+            and constant names are correct and so on. This is very important, the sooner you find a mistake -- even a
+            simple one -- the easier it is to fix.</p>
+
+        <h4 id="define">Define examples, wrap each one in check-expect.</h4>
+        <p>Write at least one example of a call to the function and the expected result the call should produce.</p>
+        <p>You will often need more examples, to help you better understand the function or to properly test the
+            function. (If once your function works and you run the program some of the code is highlighted in black it
+            means you definitely do not have enough examples.) If you are unsure how to start writing examples use the
+            combination of the function signature and the data definition(s) to help you generate examples. Often the
+            example data from the data definition is useful, but it does not necessarily cover all the important cases
+            for a particular function.</p>
+        <p>The first role of an example is to help you understand what the function is supposed to do. If there are
+            boundary conditions be sure to include an example of them. If there are different behaviours the function
+            should have, include an example of each. Since they are examples first, you could write them in this form:
+        </p>
+
+        <p>
+            <code>
+                ;; (double 0) should produce 0
+                <br>
+                ;; (double 1) should produce 2
+                <br>
+                ;; (double 2) should produce 4 
+                <br>
+            </code>
+        </p>
+        <p>When you write examples it is sometimes helpful to write not just the expected result, but also how it is
+            computed. For example, you might write the following instead of the above:</p>
+
+        <p>
+            <code>
+                ;; (double 0) should produce (* 0 2)
+                <br>
+                ;; (double 1) should produce (* 1 2)
+                <br>
+                ;; (double 2) should produce (* 2 2)
+                <br>
+            </code>
+        </p>
+        <p>While the above form satisfies our need for examples, DrRacket gives us a better way to write them, by
+            enclosing them in check-expect. This will allow DrRacket to check them automatically when the function is
+            complete. (In technical terms it will turn the examples into unit tests.)</p>
+
+        <p>
+            <code>
+                ;; Number -> Number
+                <br>
+                ;; produces n times 2
+                <br>
+                (check-expect (double 0) (* 0 2))
+                <br>
+                (check-expect (double 1) (* 1 2))
+                <br>
+                (check-expect (double 3) (* 3 2))
+                <br>
+                <br>
+                (define (double n)  0)  ; this is the stub
+            </code>
+        </p>
+        <p>The existence of the stub will allow you to run the tests. Most (or even all) of the tests will fail since
+            the stub is returning the same value every time. But you will at least be able to check that the parentheses
+            are balanced, that you have not misspelled function names etc.</p>
+
+        <h4 id="temp">Template and inventory</h4>
+        <p>Before coding the function body it is helpful to have a clear sense of what the function has to work with --
+            what is the contents of your bag of parts for coding this function? The template provides this.</p>
+
+        <p>Once the How to Design Data Definitions (HtDD) recipe in introduced, templates are produced by following the
+            rules on the <a href="#">Data Driven Templates</a> web page. You should copy the template from the data
+            definition to the function design, rename the template, and write a comment that says where the template was
+            copied from. Note that the template is copied from the data definition for the consumed type, not the
+            produced type.</p>
+
+        <p>For primitive data like numbers, strings and images the body of the template is simply (... x) where x is the
+            name of the parameter to the function.</p>
+
+        <p>Once the template is done the stub should be commented out.</p>
+
+        <p>
+            <code>
+                ;; Number -> Number
+                <br>
+                ;; produces n times 2
+                <br>
+                (check-expect (double 0) (* 0 2))
+                <br>
+                (check-expect (double 1) (* 1 2))
+                <br>
+                (check-expect (double 3) (* 3 2))
+                <br>
+                <br>
+                ;(define (double n) 0) ; this is the stub
+                <br>
+                <br>
+                (define (double n)     ; this is the template
+                <br>
+                (... n))
+                <br>
+            </code>
+        </p>
+        <p>It is also often useful to add constant values which are extremely likely to be useful to the template body
+            at this point. For example, the template for a function that renders the state of a world program might have
+            an MTS constant added to its body. This causes the template to include an inventory of useful constants.</p>
+
+        <h4 id="code2">Code the function body</h4>
+        <p>Now complete the function body by filling in the template.</p>
+        <h5>Note that:</h5>
+        <ol>
+            <li>the signature tells you the type of the parameter(s) and the type of the data the function body must
+                produce</li>
+            <li>the purpose describes what the function body must produce in English</li>
+            <li>the examples provide several concrete examples of what the function body must produce</li>
+            <li>the template tells you the raw material you have to work with</li>
+        </ol>
+        <p>You should use all of the above to help you code the function body. In some cases further rewriting of
+            examples might make it more clear how you computed certain values, and that may make it easier to code the
+            function.</p>
+
+        <p>
+            <code>
+                ;; Number -> Number
+                <br>
+                ;; produces n times 2
+                <br>
+                (check-expect (double 0) (* 0 2))
+                <br>
+                (check-expect (double 1) (* 1 2))
+                <br>
+                (check-expect (double 3) (* 3 2))
+                <br>
+                <br>
+                ;(define (double n) 0) ; this is the stub
+                <br>
+                <br>
+                ;(define (double n)    ; this is the template
+                <br>
+                ;  (... n))
+                <br>
+                <br>
+                (define (double n)
+                <br>
+                (* n 2))
+            </code>
+        </p>
+        <h4 id="test">Test and debug until correct</h4>
+        <p>Run the program and make sure all the tests pass, if not debug until they do. Many of the problems you might
+            have had will already have been fixed because of following the "run early, run often" approach. But if not,
+            debug until everything works.</p>
+        <hr>
+    </section>
+    <section>
+        <a class="back" href="#table">Back to Design Recipes Table</a>
+        <h4 id="p2">How To Design Data (HTDD)</h4>
+        <p>Data definitions are a driving element in the design recipes.</p>
+        <p>A data definition establishes the represent/interpret relationship between information and data:</p>
+        <ul>
+            <li>Information in the program's domain is represented by data in the program.</li>
+            <li>Data in the program can be interpreted as information in the program's domain.</li>
+        </ul>
+        <p>A data definition must describe how to form (or make) data that satisfies the data definition and also how to
+            tell whether a data value satisfies the data definition. It must also describe how to represent information
+            in the program's domain as data and interpret a data value as information.</p>
+        <br>
+        <p>So, for example, one data definition might say that numbers are used to represent the Speed of a ball.
+            Another data definition might say that numbers are used to represent the Height of an airplane. So given a
+            number like 6, we need a data definition to tell us how to interpret it: is it a Speed, or a Height or
+            something else entirely. Without a data definition, the 6 could mean anything.</p>
+        <br>
+        <article class="box">
+            <p>The first step of the recipe is to identify the inherent structure of the information.</p>
+            <p>Once that is done, a data definition consists of four or five elements:</p>
+            <ol>
+                <li>A possible structure definition (not until compound data)</li>
+                <li>A type comment that defines a new type name and describes how to form data of that type.</li>
+                <li>An interpretation that describes the correspondence between information and data.</li>
+                <li>One or more examples of the data.</li>
+                <li>A template for a 1 argument function operating on data of this type.</li>
+            </ol>
+            <p>In the first weeks of the course we also ask you to include a list of the <b>template rules</b> used to
+                form the template.</p>
+        </article>
+        <hr>
+        <hr>
+        <h3>What is the Inherent Structure of the Information?</h3>
+        <p>One of the most important points in the course is that:</p>
+        <ul>
+            <li>the structure of the information in the program's domain determines the kind of data definition used,
+            </li>
+            <li>which in turn determines the structure of the templates and helps determine the function examples
+                (check-expects),</li>
+            <li>and therefore the structure of much of the final program design.</li>
+        </ul>
+        <p>The remainder of this page lists in detail different kinds of data definition that are used to represent
+            information with different structures. The page also shows in detail how to design a data definition of each
+            kind. This summary table provides a quick reference to which kind of data definition to use for different
+            information structures.</p>
+        <article>
+            <table>
+                <thead>
+                    <tr>
+                        <th>When the form of the information to be represented...</th>
+                        <th>Use a data definition of this kind</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>is atomic</td>
+                        <td><a href="#d1">Simple Atomic Data</a></td>
+                    </tr>
+                    <tr>
+                        <td>is numbers within a certain range</td>
+                        <td><a href="#d2">Interval</a></td>
+                    </tr>
+                    <tr>
+                        <td>consists of a fixed number of distinct items</td>
+                        <td><a href="#d3">Enumeration</a></td>
+                    </tr>
+                    <tr>
+                        <td>is comprised of 2 or more subclasses, at least one of which is not a distinct item</td>
+                        <td><a href="#d4">Itemization</a></td>
+                    </tr>
+                    <tr>
+                        <td>consists of two or more items that naturally belong together</td>
+                        <td><a href="#d5">Compound data</a></td>
+                    </tr>
+                    <tr>
+                        <td>is naturally composed of different parts</td>
+                        <td><a href="#d6">References to other defined type</a></td>
+                    </tr>
+                    <tr>
+                        <td>is of arbitrary (unknown) size</td>
+                        <td><a href="#d7">self-referential or mutually referential</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </article>
+        <hr>
+        <hr>
+        <h3 id="d1">Simple Atomic Data</h3>
+        <p>Use simple atomic data when the information to be represented is itself atomic in form, such as the elapsed
+            time since the start of the animation, the x coordinate of a car or the name of a cat.</p>
+        <p class="code">
+            <code>
+                ;; Time is Natural
+                <br>
+                ;; interp. number of clock ticks since start of game
+                <br>
+                <br>
+
+                (define START-TIME 0)
+                <br>
+                (define OLD-TIME 1000)
+                <br>
+                <br>
+                #;
+                <br>
+                (define (fn-for-time t)
+                <br>
+                (... t))
+                <br>
+                <br>    
+                ;; Template rules used:
+                <br>
+                ;;  - atomic non-distinct: Natural
+                <br>
+            </code>
+        </p>
+        <h4>Forming the Template</h4>
+        <p>As noted below the template, it is formed according to the <a href="#">Data Driven Templates</a> recipe using
+            the right hand column of the atomic non-distinct rule.</p>
+        <h4>Guidance on Data Examples and Function Example/Tests</h4>
+        <p>One or two data examples are usually sufficient for simple atomic data.</p>
+        <p>When creating example/tests for a specific function operating on simple atomic data at least one test case
+            will be required. Additional tests are required if there are multiple cases involved. If the function
+            produces Boolean there needs to be at least a true and false test case. Also be on the lookout for cases
+            where a number of some form is an <a href="#">interval</a> in disguise, for example given a type comment
+            like Countdown is Natural, in some functions 0 is likely to be a special case.</p>
+        <br>
+        <br>
+        <br>
+        <h3 id="d2">Intervals</h3>
+        <p>Use an interval when the information to be represented is numbers within a certain range. Integer[0, 10] is
+            all the integers from 0 to 10 inclusive; Number[0, 10) is all the numbers from 0 inclusive to 10 exclusive.
+            (The notation is that [ and ] mean that the end of the interval includes the end point; ( and ) mean that
+            the end of the interval does not include the end point.)</p>
+        <p>Intervals often appear in <a href="#">itemizations</a>, but can also appear alone, as in:</p>
+        <p class="code">
+            <code>
+                ;; Countdown is Integer[0, 10]
+                <br>
+                ;; interp. the number of seconds remaining to liftoff
+                <br>
+                (define C1 10)  ; start
+                <br>
+                (define C2 5)   ; middle
+                <br>
+                (define C3 0)   ; end
+                <br>
+                <br>
+                #;
+                <br>
+                (define (fn-for-countdown cd)
+                <br>
+                (... cd))
+                <br>
+                <br>       
+                ;; Template rules used:
+                <br>
+                ;;  - atomic non-distinct: Integer[0, 10]
+                <br>
+            </code>
+        </p>
+        <h4>Forming the Template</h4>
+        <p>As noted below the template, it is formed according to the <a href="#">Data Driven Templates recipe</a> using
+            the right hand column of the atomic non-distinct rule.</p>
+        <h4>Guidance on Data Examples and Function Example/Tests</h4>
+        <p>For data examples provide sufficient examples to illustrate how the type represents information. The three
+            data examples above are probably more than is needed in that case.</p>
+        <p>When writing tests for functions operating on intervals be sure to test closed boundaries as well as
+            midpoints. As always, be sure to include enough tests to check all other points of variance in behaviour
+            across the interval.</p>
+        <br>
+        <br>
+        <h3 id="d3">Enumerations</h3>
+        <p>Use an enumeration when the information to be represented consists of a fixed number of distinct items, such
+            as colors, letter grades etc. The data used for an enumeration could in principle be anything - strings,
+            integers, images even. But we always use strings. In the case of enumerations it is sometimes redundant to
+            provide an interpretation and nearly always redundant to provide examples. The example below includes the
+            interpretation but not the examples.</p>
+        <p class="code">
+            <code>
+                ;; LightState is one of:
+                <br>
+                ;;  - "red" 
+                <br>
+                ;;  - "yellow"
+                <br>
+                ;;  - "green"
+                <br>
+                ;; interp. the color of a traffic light
+                <br>
+                <br>
+
+                ;; &lt;examples are redundant for enumerations&gt;
+                <br>
+                <br>
+                #;
+                <br>
+                (define (fn-for-light-state ls)
+                <br>
+                (cond [(string=? "red" ls) (...)]
+                <br>
+                [(string=? "yellow" ls) (...)]
+                <br>
+                [(string=? "green" ls) (...)]))
+                <br>
+                ;; Template rules used:
+                <br>
+                ;;  - one of: 3 cases
+                <br>
+                ;;  - atomic distinct: "red"
+                <br>
+                ;;  - atomic distinct: "yellow"
+                <br>
+                ;;  - atomic distinct: "green"
+                <br>
+            </code>
+        </p>
+        <br>
+        <br>
+        <h4>Forming the Template</h4>
+        <p>As noted below the template, it is formed according to the <a href="#">Data Driven Templates recipe</a> as
+            follows:</p>
+        <p>First, LightState is an enumeration with 3 cases, so the one of rule says to use a cond with 3 cases:</p>
+        <p class="code">
+            <code>
+                (define (fn-for-tlcolor ls)
+                <br>
+                    (cond [Q1 A1]
+                    <br>
+                    [Q2 A2]
+                    <br>
+                    [Q3 A3])) 
+            </code>
+        </p>
+        <p>In the first clause, "red" is a distinct atomic value, so the cond question column of the atomic distinct
+            rule says Q1 should be (string=? ls "red"). The cond answer column says A1 should be (...). So we have:</p>
+        <p class="code">
+            <code>
+                (define (fn-for-light-state ls)
+                <br>
+                    (cond [(string=? "red" ls) (...)]
+                    <br>
+                    [Q2 A2]
+                    <br>
+                    [Q3 A3])) 
+            </code>
+        </p>
+        <p>Then "yellow" and "green" are also distinct atomic values, so the final template is:</p>
+        <p class="code">
+            <code>
+                (define (fn-for-light-state ls) 
+                <br>
+                    (cond [(string=? "red" ls) (...)]
+                    <br>
+                    [(string=? "yellow" ls) (...)]
+                    <br>
+                    [(string=? "green" ls) (...)]))
+            </code>
+        </p>
+        <h5>Guidance on Data Examples and Function Example/Tests</h5>
+        <p>Data examples are redundant for enumerations.
+
+            Functions operating on enumerations should have (at least) as many tests as there are cases in the
+            enumeration.</p>
+        <h5>Large Enumerations</h5>
+        <p>Some enumerations contain a large number of elements. A canonical example is KeyEvent, which is provided as
+            part of big-bang. KeyEvent includes all the letters of the alphabet as well as other keys you can press on
+            the keyboard. It is not necessary to write out all the cases for such a data definition. Instead write one
+            or two, as well as a comment saying what the others are, where they are defined etc.</p>
+        <p>Defer writing templates for such large enumerations until a template is needed for a specific function. At
+            that point include the specific cases that function cares about. Be sure to include an else clause in the
+            template to handle the other cases. As an example, some functions operating on KeyEvent may only care about
+            the space key and just ignore all other keys, the following would be an appropriate template for such
+            functions.</p>
+        <p class="code">
+            <code>
+                #;
+                <br>
+                (define (fn-for-key-event kevt)
+                <br>
+                    (cond [(key=? " " kevt) (...)]
+                <br>
+                        [else
+                <br>
+                          (...)]))
+                <br>
+                ;; Template formed using the large enumeration special case
+            </code>
+        </p>
+        <p>The same is true of writing tests for functions operating on large enumerations. All the specially handled
+            cases must be tested, in addition one more test is required to check the else clause.
+        </p>
+        <br>
+        <br>
+        <h3 id="d4">Itemizations</h3>
+        <p>An itemization describes data comprised of 2 or more subclasses, at least one of which is not a distinct
+            item. (C.f. enumerations, where the subclasses are all distinct items.) In an itemization the template is
+            similar to that for enumerations: a cond with one clause per subclass. In cases where the subclass of data
+            has its own data definition the answer part of the cond clause includes a call to a helper template, in
+            other cases it just includes the parameter.</p>
+        <p class="code">
+            <code>
+                ;; Bird is one of:
+                <br>
+;;  - false
+<br>
+;;  - Number
+<br>
+;; interp. false means no bird, number is x position of bird
+<br>
+<br>
+(define B1 false)
+<br>
+(define B2 3) 
+<br>
+<br>
+#;
+<br>
+(define (fn-for-bird b)
+<br>
+  (cond [(false? b) (...)]
+  <br>
+        [(number? b) (... b)]))
+        <br>
+;; Template rules used:
+<br>
+;;  - one of: 2 cases
+<br>
+;;  - atomic distinct: false
+<br>
+;;  - atomic non-distinct: Number
+            </code>
+        </p>
+
+        <h4>Forming the Template</h4>
+        <p>As noted below the template, it is formed according to the <a href="#">Data Driven Templates recipe</a> using
+            the one-of rule, the atomic distinct rule and the atomic non-distinct rule in order.</p>
+        <h4>Guidance on Data Examples and Function Example/Tests</h4>
+        <p>As always, itemizations should have enough data examples to clearly illustrate how the type represents
+            information.
+
+            Functions operating on itemizations should have at least as many tests as there are cases in the
+            itemizations. If there are intervals in the itemization, then there should be tests at all points of
+            variance in the interval. In the case of adjoining intervals it is critical to test the boundaries.</p>
+
+        <h4>Itemization of Intervals</h4>
+        <p>A common case is for the itemization to be comprised of 2 or more intervals. In this case functions operating
+            on the data definition will usually need to be tested at all the boundaries of closed intervals and points
+            between the boundaries.</p>
+        <p class="code">
+            <code>
+        ;;; Reading is one of:
+        <br>
+;;  - Number[> 30] 
+<br>     
+;;  - Number(5, 30]
+<br>     
+;;  - Number[0, 5]
+<br>      
+;; interp. distance in centimeters from bumper to obstacle
+<br>
+;;    Number[> 30]    is considered "safe"
+<br>
+;;    Number(5, 30]   is considered "warning"
+<br>
+;;    Number[0, 5]    is considered "dangerous"
+<br>
+(define R1 40)
+<br>
+(define R2 .9)
+<br>
+<br>
+(define (fn-for-reading r)
+<br>
+  (cond [(< 30 r) (... r)]
+  <br>
+        [(and (<  5 r) (<= r  30)) (... r)]
+        <br>
+        [(<= 0 r 5) (... r)]))
+        <br>
+        <br>
+;; Template rules used:
+<br>
+;;  one-of: 3 cases
+<br>
+;;  atomic non-distinct:  Number[>30]
+<br>
+;;  atomic non-distinct:  Number(5, 30]
+<br>
+;;  atomic non-distinct:  Number[0, 5]
+    </code>
+        </p>
+        <p>As noted below the template, it is formed according to the <a href="#">Data Driven Templates recipe</a> using
+            the one-of rule, followed by 3 uses of the atomic non-distinct rule.</p>
+        <br>
+        <br>
+        <h3 id="d5">Compound data (structures)</h3>
+        <p>Use structures when two or more values naturally belong together. The define-struct goes at the beginning of
+            the data definition, before the types comment.</p>
+        <p class="code">
+            <code>
+        (define-struct ball (x y))
+        <br>
+;; Ball is (make-ball Number Number)
+<br>
+;; interp. a ball at position x, y 
+<br>
+<br>
+(define BALL-1 (make-ball 6 10))
+<br>
+<br>
+#;
+<br>
+(define (fn-for-ball b)
+<br>
+  (... (ball-x b)     ;Number
+  <br>
+       (ball-y b)))   ;Number
+       <br>
+;; Template rules used:
+<br>
+;;  - compound: 2 fields
+    </code>
+        </p>
+        <p>The template above is formed according to the <a href="#">Data Driven Templates recipe</a> using the compound
+            rule. Then for each of the selectors, the result type of the selector (Number in the case of ball-x and
+            ball-y) is used to decide whether the selector call itself should be wrapped in another expression. In this
+            case, where the result types are primitive, no additional wrapping occurs. C.f. cases below when the
+            reference rule applies.</p>
+        <h4>Guidance on Data Examples and Function Example/Tests</h4>
+        <p>For compound data definitions it is often useful to have numerous examples, for example to illustrate special
+            cases. For a snake in a snake game you might have an example where the snake is very short, very long,
+            hitting the edge of a box, touching food etc. These data examples can also be useful for writing function
+            tests because they save space in each check-expect.</p>
+        <br>
+        <br>
+        <h3 id="d6">References to other data definitions</h3>
+        <p>Some data definitions contain references to other data definitions you have defined (non-primitive data
+            definitions). One common case is for a compound data definition to comprise other named data definitions.
+            (Or, once lists are introduced, for a list to contain elements that are described by another data
+            definition. In these cases the template of the first data definition should contain calls to the second data
+            definition's template function wherever the second data appears. For example:</p>
+        <p class="code">
+            <code>
+        ---assume Ball is as defined above---
+<br>
+<br>
+(define-struct game (ball score))
+<br>
+;; Game is (make-game Ball Number) 
+<br>
+<br>
+;; interp. the current ball and score of the game
+<br>
+<br>
+(define GAME-1 (make-game (make-ball 1 5) 2))
+<br>
+<br>
+#;
+<br>
+(define (fn-for-game g)
+<br>
+  (... (fn-for-ball (game-ball g))
+  <br>
+       (game-score g)))      ;Number
+       <br>
+;; Template rules used:
+<br>
+;;  - compound: 2 fields
+<br>
+;;  - reference: ball field is Ball
+<br>
+    </code>
+        </p>
+        <p>In this case the template is formed according to the <a href="#">Data Driven Templates recipe</a> by first
+            using the compound rule. Then, since the result type of (game-ball g) is Ball, the reference rule is used to
+            wrap the selector so that it becomes (fn-for-ball (game-ball g)). The call to game-score is not wrapped
+            because it produces a primitive type.</p>
+        <br>
+        <br>
+        <h4>Guidance on Data Examples and Function Example/Tests</h4>
+        <p>For data definitions involving references to non-primitive types the data examples can sometimes become quite
+            long. In these cases it can be helpful to define well-named constants for data examples for the referred to
+            type and then use those constants in the referring from type. For example:</p>
+        <p>
+            <code>
+        ...in the data definition for Drop...
+        <br>
+(define DTOP (make-drop 10 0))            ;top of screen
+<br>
+(define DMID (make-drop 20 (/ HEIGHT 2))) ;middle of screen
+<br>
+(define DBOT (make-drop 30 HEIGHT))       ;at bottom edge
+<br>
+(define DOUT (make-drop 40 (+ HEIGHT 1))) ;past bottom edge
+<br>
+<br>
+...in the data definition for ListOfDrop...
+<br>
+(define LOD1 empty)
+<br>
+(define LOD-ALL-ON             (cons DTOP (cons DMID )))
+<br>
+(define LOD-ONE-ABOUT-TO-LEAVE (cons DTOP (cons DMID (cons DBOT empty))))
+<br>
+(define LOD-ONE-OUT-ALREADY    (cons DTOP (cons DMID (cons DBOT (cons DOUT empty)))))
+<br>
+    </code>
+        </p>
+        <p>In the case of references to non-primitive types the function operating on the referring type (i.e.
+            ListOfDrop) will end up with a call to a helper that operates on the referred to type (i.e. Drop). Tests on
+            the helper function should fully test that function, tests on the calling function may assume the helper
+            function works properly.</p>
+        <br>
+        <br>
+        <h3 id="d7">Self-referential or mutually referential</h3>
+        <p>When the information in the program's domain is of arbitrary size, a well-formed self-referential (or
+            mutually referential) data definition is needed.</p>
+        <ul>
+            <li>(i) have at least one case without self reference (the base case(s))</li>
+            <li>(ii) have at least one case with self reference</li>
+        </ul>
+        <p>The template contains a base case corresponding to the non-self-referential clause(s) as well as one or more
+            natural recursions corresponding to the self-referential clauses.</p>
+        <p>
+            <code>
+        ;; ListOfString is one of:
+        <br>
+;;  - empty
+<br>
+;;  - (cons String ListOfString)
+<br>
+;; interp. a list of strings
+<br>
+<br>
+(define LOS-1 empty)
+<br>
+(define LOS-2 (cons "a" empty))
+<br>
+(define LOS-3 (cons "b" (cons "c" empty)))
+<br>
+<br>
+#;
+<br>
+(define (fn-for-los los)
+<br>
+  (cond [(empty? los) (...)]                   ;BASE CASE
+  <br>
+        [else (... (first los)                 ;String
+        <br>
+                   (fn-for-los (rest los)))])) ;NATURAL
+                   <br>
+                    RECURSION
+                    <br>
+;;             /
+<br>
+;;            /
+<br>
+;;       COMBINATION
+<br>
+;; Template rules used:
+<br>
+;;  - one of: 2 cases
+<br>
+;;  - atomic distinct: empty
+<br>
+;;  - compound: (cons String ListOfString)
+<br>
+;;  - self-reference: (rest los) is ListOfString
+<br>
+    </code>
+        </p>
+        <p>In some cases a types comment can have both self-reference and reference to another type.</p>
+
+        <p>
+            <code>
+        (define-struct dot (x y))
+        <br>
+;; Dot is (make-dot Integer Integer)
+<br>
+;; interp. A dot on the screen, w/ x and y coordinates.
+<br>
+(define D1 (make-dot 10 30))
+<br>
+#;
+<br>
+(define (fn-for-dot d)
+<br>
+  (... (dot-x d)   ;Integer
+  <br>
+       (dot-y d))) ;Integer
+       <br>
+;; Template rules used:
+<br>
+;;  - compound: 2 fields
+<br>
+<br>
+;; ListOfDot is one of:
+<br>
+;;  - empty
+<br>
+;;  - (cons Dot ListOfDot)
+<br>
+;; interp. a list of Dot
+<br>
+(define LOD1 empty)
+<br>
+(define LOD2 (cons (make-dot 10 20) (cons (make-dot 3 6) empty)))
+<br>
+#;
+<br>
+(define (fn-for-lod lod)
+<br>
+  (cond [(empty? lod) (...)]
+  <br>
+        [else
+        <br>
+         (... (fn-for-dot (first lod))
+         <br>
+              (fn-for-lod (rest lod)))]))
+              <br>
+              <br>
+;; Template rules used:
+<br>
+;;  - one of: 2 cases
+<br>
+;;  - atomic distinct: empty
+<br>
+;;  - compound: (cons Dot ListOfDot)
+<br>
+;;  - reference: (first lod) is Dot
+<br> 
+;;  - self-reference: (rest lod) is ListOfDot
+<br>
+    </code>
+        </p>
+        <h4>Guidance on Data Examples and Function Example/Tests</h4>
+        <p>When writing data and function examples for self-referential data definitions always put the base case first.
+            Its usually trivial for data examples, but many function tests don't work properly if the base case isn't
+            working properly, so testing that first can help avoid being confused by a failure in a non base case test.
+            Also be sure to have a test for a list (or other structure) that is at least 2 long.</p>
+        <br>
+        <hr>
+        <hr>
+    </section>
+    <section>
+        <a class="back" href="#table">Back to Design Recipes Table</a>
+        <h4 id="p3">How To Design Worlds (HtDW)</h4>
+        <p>The How to Design Worlds process provides guidance for designing interactive world programs using big-bang. While some elements of the process are tailored to big-bang, the process can also be adapted to the design of other interactive programs. The wish-list technique can be used in any multi-function program.
+        </p>
+        <br>
+        <article id="htdw">
+            <p>World program design is divided into two phases, each of which has sub-parts:</p>
+            <ol>
+                <li>Domain analysis (use a piece of paper!)</li>
+                <ol>
+                    <li>Sketch program scenarios</li>
+                    <li>Identify constant information</li>
+                    <li>Identify changing information</li>
+                    <li>Identify big-bang options</li>
+                </ol>
+                <li>Build the actual program</li>
+                <ol>
+                    <li>Constants (based on 1.2 above)</li>
+                    <li>Data definitions using <a href="#">HtDD</a> (based on 1.3 above)</li>
+                    <li>Functions using <a href="#">HtDF</a>
+                    <ol>
+                        <li>main first (based on 1.3, 1.4 and 2.2 above)</li>
+                        <li>wish list entriesfor big-bang handlers</li>
+                    </ol>
+                </li>
+                <li>Work through wish list until done</li>
+                </ol>
+            </ol>
+        </article>
+        <br>
+        <h4>Phase 1: Domain Analysis</h4>
+        <p>Do a domain analysis by hand-drawing three or more pictures of what the world program will look like at different stages when it is running.
+<br>
+            Use this picture to identify constant information such as the height and width of screen, color of the background, the background image itself, the length of a firework's fuse, the image for a moving cat and so on.
+            <br>
+            Also identify changing information such as the position of a firework, the color of a light, the number in countdown etc.
+            <br>
+            Identify which big-bang options the program needs.</p>
+            <br>
+        <article>
+            <table>
+                <thead>
+                    <tr>
+                        <th>If your program needs to:</th>
+                        <th>Then it needs this option:</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>change as time goes by (nearly all do)</td>
+                        <td>on-tick</td>
+                    </tr>
+                    <tr>
+                        <td>display something (nearly all do)</td>
+                        <td>to-draw</td>
+                    </tr>
+                    <tr>
+                        <td>change in response to key presses</td>
+                        <td>on-key</td>
+                    </tr>
+                    <tr>
+                        <td>change in response to mouse activity</td>
+                        <td>on-mouse</td>
+                    </tr>
+                    <tr>
+                        <td>stop automatically</td>
+                        <td>stop-when</td>
+                    </tr>
+                </tbody>
+            </table>
+        </article>
+        <br>
+        <p>(There are several more options to big-bang. Look in the DrRacket help desk under big-bang for a complete list.)</p>
+        <h4>Phase 2: Building the actual program</h4>
+        <p>Structure the actual program in four parts:</p>
+        <br>
+        <ol>
+            <li>Requires followed by one line summary of program's behavior</li>
+            <li>Constants</li>
+            <li>Data definitions</li>
+            <li>Functions</li>
+        </ol>
+        <p>The program should begin with whatever require declarations are required. For a program using big-bang this is usually a require for 2htdp/universe to get big-bang itself and a require for 2htdp/image to get useful image primitives. This is followed by a short summary of the program's behavior (ideally 1 line).</p>
+        <p>The next section of the file should define constants. These will typically come directly from the domain analysis.</p>
+        <p>This is followed by data definitions. The data definitions describe how the world state - the changing information identified during the analysis - will be represented as data in the program. Simple world programs may have just a single data definition. More complex world programs have a number of data definitions.</p>
+        <p>The functions section should begin with the main function which uses big-bang with the appropriate options identified during the analysis. After that put the more important functions first followed by the less important helpers. Keep groups of closely related functions together.</p>
+        <h5>Template for a World Program</h5>
+        <p>A useful template for a world program, including a template for the main function and wish list entries for tick-handler and to-draw handler is as follows. To use this template replace WS with the appropriate type for your changing world state. You may want to give the handler functions more descriptive names and you should definitely give them all a more descriptive purpose.</p>
+        <p>
+            <code>
+                (require 2htdp/image)
+                <br>
+(require 2htdp/universe)
+<br>
+<br>
+;; My world program  (make this more specific)
+<br>
+<br>
+;; =================
+<br>
+;; Constants:
+<br>
+<br>
+;; =================
+<br>
+;; Data definitions:
+<br>
+<br>
+;; WS is ... (give WS a better name)
+<br>
+<br>
+<br>
+;; =================
+<br>
+;; Functions:
+<br>
+<br>
+;; WS -> WS
+<br>
+;; start the world with ...
+<br>
+;; 
+<br>
+(define (main ws)
+<br>
+  (big-bang ws                   ; WS
+  <br>
+            (on-tick   tock)     ; WS -> WS
+            <br>
+            (to-draw   render)   ; WS -> Image
+            <br>
+            (stop-when ...)      ; WS -> Boolean
+            <br>
+            (on-mouse  ...)      ; WS Integer Integer
+            <br> 
+            MouseEvent -> WS
+            <br>
+            (on-key    ...)))    ; WS KeyEvent -> WS
+            <br>
+            <br>
+;; WS -> WS
+<br>
+;; produce the next ...
+<br>
+;; !!!
+<br>
+(define (tock ws) ...)
+<br>
+<br>
+;; WS -> Image
+<br>
+;; render ...
+<br> 
+;; !!!
+<br>
+(define (render ws) ...)
+<br>
+            </code>
+        </p>
+        <p>Depending on which other big-bang options you are using you would also end up with wish list entries for those handlers. So, at an early stage a world program might look like this:</p>
+        <br>
+        <p>
+            <code>
+                (require 2htdp/universe)
+                <br>
+                (require 2htdp/image)
+                <br>
+                <br>
+;; A cat that walks across the screen.
+<br>
+<br>
+;; Constants:
+<br>
+<br>
+(define WIDTH  200)
+<br>
+(define HEIGHT 200)
+<br>
+<br>
+(define CAT-IMG (circle 10 "solid" "red")) ; a not very attractive cat
+<br>
+(define MTS (empty-scene WIDTH HEIGHT))
+<br>
+<br>
+<br>
+;; Data definitions:
+<br>
+<br>
+;; Cat is Number
+<br>
+;; interp. x coordinate of cat (in screen coordinates)
+<br>
+(define C1 1)
+<br>
+(define C2 30)
+<br>
+<br>
+#;
+<br>
+(define (fn-for-cat c)
+<br>
+  (... c))
+  <br>
+  <br>
+  <br>
+;; Functions:
+<br>
+<br>
+;; Cat -> Cat
+<br>
+;; start the world with initial state c, for example: (main 0)
+<br>
+(define (main c)
+<br>
+  (big-bang c                         ; Cat
+  <br>
+            (on-tick   tock)          ; Cat -> Cat
+            <br>
+            (to-draw   render)))      ; Cat -> Image
+            <br>
+            <br>
+;; Cat -> Cat
+<br>
+;; Produce cat at next position
+<br>
+;!!!
+<br>
+(define (tock c) 1)  ;stub
+<br>
+<br>
+;; Cat -> Image
+<br>
+;; produce image with CAT-IMG placed on MTS at proper x, y position
+<br>
+; !!!
+<br>
+(define (render c) MTS)
+<br>
+<br>
+            </code>
+        </p>
+        <br>
+        <p>Note that we are maintaining a wish listof functions that need to be designed. The way to maintain the wish list is to just write a signature, purpose and stub for each wished-for function, also label the wish list entrywith !!! or some other marker that is easy to search for. That will help you find your unfilled wishes later.</p>
+        <p>Forming wish list entries this way is enough for main (or other functions that call a wished for function) to be defined without error. But of course main (and other such functions) will not run properly until the wished for functions are actually completely designed.</p>
+        <p>As you design the program remember to run early and run often. The sooner you can run the program after writing anything the sooner you can find any small mistakes that might be in it. Fixing the small mistakes earlier makes it easier to find any harder mistakes later.</p>
+        <h5>Key and Mouse Handlers</h5>
+        <p>The on-key and on-mouse handler function templates are handled specially. The on-key function is templated according to its second argument, a KeyEvent, using the large enumeration rule. The on-mouse function is templated according to its MouseEvent argument, also using the large enumeration rule. So, for example, for a key handler function that has a special behaviour when the space key is pressed but does nothing for any other key event the following would be the template:</p>
+
+        <p>
+            <code>
+                (define (handle-key ws ke)
+                <br>
+                    (cond [(key=? ke " ") (... ws)]
+                    <br>
+                        [else 
+                        <br>
+                            (... ws)]))
+                            <br>
+            </code>
+        </p>
+        <p>Similarly the template for a mouse handler function that has special behavior for mouse clicks but ignores all other mouse events would be:</p>
+        <p>
+            <code>
+                (define (handle-mouse ws x y me)
+                <br>
+                    (cond [(mouse=? me "button-down") (... ws x y)]
+                    <br>
+                        [else
+                        <br>
+                        (... ws x y)]))
+                        <br>
+           </code>
+    </p>
+    <p>For more information on the KeyEvent and MouseEvent large enumerations see the DrRacket help desk.</p>
+    <br>
+    <hr>
+    <hr>
+    <hr>
+    </section>
+    <section>
+        <a class="back" href="#table">Back to Design Recipes Table</a>
+        <h2 id="p4">Data Driven Templates</h2>
+        <p>Templates are the core structure that we know a function must have, independent of the details of its definition. In many cases the template for a function is determined by the type of data the function consumes. We refer to these as data driven templates. The recipe below can be used to produce a data driven template for any type comment.</p>
+        <p>For a given type TypeName the data driven template is:</p>
+        <p class="code">
+            <code>
+                (define (fn-for-type-name x)
+                <br>
+                    <body>)
+                        <br>
+            </code>
+        </p>
+        <p>Where x is an appropriately chosen parameter name (often the initials of the type name) and the body is determined according to the table below. To use the table, start with the type of the parameter, i.e. TypeName, and select the row of the table that matches that type. The first row matches only primitive types, the later rows match parts of type comments.</p>
+        <p>(Note that when designing functions that consume additional atomic parameters, the name of that parameter gets added after every ... in the template. Templates for functions with additional complex parameters are covered in <a href="#">Functions on 2 One-Of Data</a>.)</p>
+        <article>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type of data</th>
+                        <th>cond question (if applicable)</th>
+                        <th>Body or cond answer (if applicable)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <b>Atomic Non-Distinct</b>
+                            <p>
+                                <ul>
+                                    <li>Number</li>
+                                    <li>String</li>
+                                    <li>Boolean</li>
+                                    <li>Image</li>
+                                    <li>interval like Number[0, 10)</li>
+                                    <li>etc.</li>
+                                </ul>
+                            </p>
+                        </td>
+                        <td>
+                            <b>Appropriate predicate</b>
+                            <p>
+                                <ul>
+                                    <li>(number? x)</li>
+                                    <li>(string? x)</li>
+                                    <li>(boolean? x)</li>
+                                    <li>(image? x)</li>
+                                    <li>(and (<= 0 x)
+                                        <br>
+                                        (< x 10))
+                                    </li>
+                                    <li>etc.</li>
+                                </ul>
+                            </p>
+                        </td>
+                        <td><b>Expression that operates on the parameter.</b>
+                            <p><ul><li>(... x)</li></ul></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Atomic Distinct Value</b>
+                            <p>
+                                <ul>
+                                    <li>"red"</li>
+                                    <li>false</li>
+                                    <li>empty</li>
+                                    <li>etc.</li>
+                                </ul>
+                            </p>
+                        </td>
+                        <td>
+                            <b>Appropriate predicate</b>
+                            <p>
+                                <ul>
+                                    <li>(string=? x "red")</li>
+                                    <li>(false? x)</li>
+                                    <li>(empty? x)</li>
+                                    <li>etc.</li>
+                                </ul>
+                            </p>
+                        </td>
+                        <td>
+                            <b>Since value is distinct, parameter does not appear.</b>
+                            <p><ul><li>(...)</li></ul></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>One Of</b>
+                            <ul>
+                                <li>enumerations</li>
+                                <li>itemizations</li>
+                            </ul>
+                        </td>
+                        <td>
+
+                        </td>
+                        <td>
+                            <p>Cond with one clause per subclass of one of.</p>
+                            <br>
+                            <code>
+                                (cond [<question1> <answer1>]
+                                    <br>
+                                    [<question2> <answer2>])
+                            </code>
+                            <br>
+                            <p>Where each question and answer expression is formed by following the rule in the question or answer column of this table for the corresponding case. A detailed derivation of a template for a one-of type appears below.</p>
+                            <p>It is permissible to use else for the last question for itemizations and large enumerations. Normal enumerations should not use else.</p>
+                            <p>Note that in a mixed data itemization, such as</p>
+                            <p><code>
+                                ;; Measurement is one of:
+                                <br>
+                                ;; - Number[-10, 0)
+                                <br>
+                                ;; - true
+                                <br>
+                                ;; - Number(0, 10]
+                                <br>
+                            </code></p>
+                            <p>the cond questions must be guarded with an appropriate type predicate. In particular, the first cond question for Measurement must be</p>
+                            <p>
+                                <code>
+                                    (and (number? m)
+                                    <br>
+                                        (<= -10 m)
+                                        <br>
+                                        (< m 0))
+                                        <br>
+                                </code>
+                            </p>
+                            <p>where the call to number? guards the calls to <= and <. This will protect <= and < from ever receiving true as an argument.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>Compound</b>
+                            <p>
+                                <ul>
+                                    <li>Position</li>
+                                    <li>Firework</li>
+                                    <li>Ball</li>
+                                    <li>cons</li>
+                                    <li>etc.</li>
+                                </ul>
+                            </p>
+                        </td>
+                        <td>
+                            <b>Predicate from structure</b>
+                            <ul>
+                                <li>(posn? x)</li>
+                                <li>(firework? x)</li>
+                                <li>(ball? x)</li>
+                                <li>(cons? x) (often just else)</li>
+                                <li>etc.</li>
+                            </ul>
+                        </td>
+                        <td>
+                            <b>All selectors.</b>
+                            <ul>
+                                <li>(... (posn-x x) (posn-y x))</li>
+                                <li>(... (firework-y x) (firework-color x))</li>
+                                <li>(... (ball-x x) (ball-dx x))</li>
+                                <li>(... (first x) (rest x))</li>
+                                <li>etc.</li>
+                            </ul>
+                            <br>
+                            <p>Then consider the result type of each selector call and wrap the accessor expression appropriately using the table with that type. So for example, if after adding all the selectors you have:</p>
+                            <p>
+                                <code>
+                                    (... (game-ball g) ;produces Ball
+                                    <br>
+                                    (game-paddle g)) ;produces Paddle
+                                    <br>
+                                </code>
+                            </p>
+                            <p>Then, because both Ball and Paddle are non-primitive types (types that you yourself defined in a data definition) the reference rule (immediately below) says that you should add calls to those types' template functions as follows:</p>
+                            <br>
+                            <code>
+                                (... (fn-for-ball (game-ball g))
+                                <br>
+                                (fn-for-paddle (game-paddle g)))
+                                <br>
+                            </code>
+                            <br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Other Non-Primitive Type Reference</b></td>
+                        <td>
+                            <b>Predicate, usually from structure definition 
+                            </b>
+                            <ul>
+                                <li>(firework? x)</li>
+                                <li>(person? x)</li>
+                            </ul>
+                        </td>
+                        <td><b>Call to other type's template function</b>
+                            <ul>
+                                <li>(fn-for-firework x)</li>
+                                <li>(fn-for-person x)</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Self Reference</b></td>
+                        <td></td>
+                        <td><b>Form natural recursion with call to this type's template function:</b>
+                            <ul><li>(fn-for-los (rest los))</li></ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Mutual Reference</b>
+                        <p>Note: form and group all templates in mutual reference cycle together.</p></td>
+                        <td></td>
+                        <td><b>Call to other type's template function:</b>
+                            <br>
+                        <code>
+                            (fn-for-lod (dir-subdirs d)
+                            <br>
+                            (fn-for-dir (first lod))
+                            <br>
+                        </code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </article>
+    </section>
+</body>
+
+</html>

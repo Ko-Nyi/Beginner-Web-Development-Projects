@@ -1,0 +1,54 @@
+body{
+    border: 3px solid rgb(70, 70, 113);
+}
+table,th,td{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+.sect1{
+    padding: 20px;
+}
+table{
+    width: 95%;
+}
+thead{
+    background-color: rgb(197, 181, 212);
+}
+th, td { padding: 5px; }
+.div{
+    text-align: center;
+}
+body{
+    font-family: Inter,Helvetica,Arial, Helvetica, sans-serif;
+    font-style: normal;
+    font-size: 1.125rem;
+    line-height: 1em;
+    background: #fff;
+    background-image: initial;
+    background-position-x: initial;
+    background-position-y: initial;
+    background-size: initial;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+    background-color: rgb(255, 255, 255);
+    padding: 10px;
+}
+
+.box{
+    border: 1px solid black;
+    padding: 15px;
+    font-family: Times, serif;
+    font-size: medium;
+}
+section.back{
+    text-align: right;
+}
+.code{
+    border: 1px solid black;
+    padding: 20px;
+}
+#htdw{
+    border: 1px solid black;
+    padding: 10px;
+}
